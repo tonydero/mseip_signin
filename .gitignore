@@ -1,2 +1,12 @@
 *.csv
 .ropeproject
+.mseip-cli.py.swp
+*.pyc
+*.toc
+*.zip
+*.manifest
+*.pkg
+*.pyz
+*.exe
+build/mseip-cli/xref-mseip-cli.html
+build/mseip-cli/warn-mseip-cli.txt
