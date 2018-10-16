@@ -4,7 +4,12 @@
 # ask for password from mentor when the application is first started
 import getpass
 from hashlib import sha512
+from pathlib import Path
+db_dir = Path.home() / 'MSEIP_DB'
 pass_file = './pass_file'
+
+
+print('DB storage location: ', str(db_dir))
 with open(pass_file, 'r') as passf:
     pass_chk = passf.read()
 pass_wrong = True
@@ -23,12 +28,12 @@ while pass_wrong:
 import datetime as d
 import pandas as pd
 import os
-from pathlib import Path
 from distutils.util import strtobool
-from time import sleep
+from time import sleep, time
 import sys
 import smtplib
 from email.mime.text import MIMEText
+import re
 
 
 cours_ref = []
@@ -42,10 +47,9 @@ cours_ref.append('EE317 Semiconductors & Electronics')
 cours_ref.append('EE320 Signals & Systems I')
 cours_ref.append('EE325 Signals & Systems II')
 cours_ref.append('EE340 Fields & Waves')
-cours_ref.append('Other')  # keep last
+cours_ref.append('another course')  # keep last
 dua_file = './dua_file'  # using v4
 key_file = './key_file'
-db_dir = Path.home() / 'MSEIP_DB'
 student_info_file = db_dir / 'student_info.csv'
 time_log_file = db_dir / 'time_log.csv'
 
@@ -59,9 +63,10 @@ def signIn(key_val):
     # check to see if card was swiped
     if len_id == 98:
         bann_id = bann_id[52:61]
-    # check to make sureCourses ID is correct (as much as possible)
+    # check to make sure ID is correct (as much as possible)
     unchkd_id = True
     while unchkd_id:
+        len_id = len(bann_id)
         if len_id == 6:
             bann_id = '800' + bann_id
             unchkd_id = False
@@ -75,6 +80,10 @@ def signIn(key_val):
                 bann_id = input('Invalid ID#\n'
                                 'Please swipe your Aggie ID or enter your'
                                 ' ID#: ')
+        else:
+            bann_id = input('Invalid ID#\n'
+                            'Please swipe your Aggie ID or enter your'
+                            ' ID#: ')
     #print(bann_id); sleep(3)  # FOR DEBUGGING
 
     # hash ID
@@ -94,51 +103,66 @@ def signIn(key_val):
         student_info = pd.DataFrame(columns=['over18','DUA','ProfUse','email'])
         # loggedIn binary (true if student has not logged out)
         time_log = pd.DataFrame(columns=['hashedID','loggedIn','logTime',
-                                         'reason'] + cours_ref)
+                                         'logDuration','reason'] + cours_ref)
         Path.mkdir(db_dir, exist_ok=True)
 
     # check database for ID
-    curr_time = d.datetime.now().strftime('%Y%m%d_%H%M%S')
+    curr_time = time()
     if bann_id_hash in set(student_info.index):
         returning = True
         # load values from database
         ovr_18 = student_info.loc[bann_id_hash, 'over18']
         dua_all = student_info.loc[bann_id_hash, 'DUA']
         dua_prof = student_info.loc[bann_id_hash, 'ProfUse']
-        logd_in_index = time_log.loc[time_log['hashedID'] ==  \
-                                     bann_id_hash].index.max()
-        logd_in = time_log.iloc[logd_in_index, 1]
+        # check for ID in last 100 time log entries, because under 18s
+        if bann_id_hash in set(time_log['hashedID'][-100:]):
+            logd_in_index = time_log.loc[time_log['hashedID'] ==  \
+                                         bann_id_hash].index.max()
+            logd_in = time_log.iloc[logd_in_index, 1]
+            logd_in_time = time_log.iloc[logd_in_index, 2]
+            logd_in_dur = curr_time - logd_in_time
+        else:
+            logd_in = False
+
         if logd_in:
             # update id in previous entry to no_id_hash
-            if not ovr_18:
+            if not ovr_18 or not dua_prof:
                 time_log.iloc[logd_in_index, 0] = no_id_hash
-            time_log = time_log.append({'hashedID': no_id_hash,
-                                        'loggedIn': False,
-                                        'logTime': curr_time,
-                                        'reason': 'log out'},
-                                       ignore_index=True)
+                time_log = time_log.append({'hashedID': no_id_hash,
+                                            'loggedIn': False,
+                                            'logTime': curr_time,
+                                            'logDuration': logd_in_dur,
+                                            'reason': 'log out'},
+                                           ignore_index=True)
+            else:
+                time_log = time_log.append({'hashedID': bann_id_hash,
+                                            'loggedIn': False,
+                                            'logTime': curr_time,
+                                            'logDuration': logd_in_dur,
+                                            'reason': 'log out'},
+                                           ignore_index=True)
+                
             time_log.to_csv(time_log_file)
             if (not ovr_18 or not dua_all) and dua_prof:
-                print('Your personal data has been discarded.')
+                print('Your personal data have been discarded.')
             elif not dua_prof:
-                print('All of your data has been discarded.')
+                print('All of your data have been discarded.')
             print('Thank you for using ECE Peer Mentoring! Have a great day!')
             sleep(4)
             return
 
-        if (not ovr_18 or not dua_all) and dua_prof:
-            print('Your personal data will be discarded after this session.')
-            sleep(3)
-        elif not dua_prof:
-            print('All of your data will be discarded after this session.')
-            sleep(3)
-        cls()
+        #if (not ovr_18 or not dua_all) and dua_prof:
+        #    print('Your personal data will be discarded after this session.')
+        #    sleep(3)
+        #elif not dua_prof:
+        #    print('All of your data will be discarded after this session.')
+        #    sleep(3)
     # if student never has attended any mentoring or SI session
     else:
         returning = False
         cls()
         # present data use agreement
-        with open(dua_file, 'r') as fin:
+        with open(dua_file, 'r',encoding="utf8") as fin:
             print(fin.read())
         while True:
             try:
@@ -148,6 +172,9 @@ def signIn(key_val):
                 print('Incorrect response. Please answer yes or no.')
 
         email = input('Email: ')
+        while not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            print('Invalid email.')
+            email = input('Email: ')
         # need something to trigger sending the email *************************
         if ovr_18:
             while True:
