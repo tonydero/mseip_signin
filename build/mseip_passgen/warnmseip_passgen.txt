@@ -1,0 +1,32 @@
+missing module named 'multiprocessing.forking' - imported by /home/tonydero/environs/mlenv/lib/python3.5/site-packages/PyInstaller/loader/rthooks/pyi_rth_multiprocessing.py
+missing module named multiprocessing.get_context - imported by multiprocessing, multiprocessing.pool, multiprocessing.managers, multiprocessing.sharedctypes
+missing module named multiprocessing.TimeoutError - imported by multiprocessing, multiprocessing.pool
+missing module named multiprocessing.BufferTooShort - imported by multiprocessing, multiprocessing.connection
+missing module named multiprocessing.AuthenticationError - imported by multiprocessing, multiprocessing.connection
+missing module named multiprocessing.set_start_method - imported by multiprocessing, multiprocessing.spawn
+missing module named multiprocessing.get_start_method - imported by multiprocessing, multiprocessing.spawn
+missing module named 'org.python' - imported by pickle, /home/tonydero/repos/mseip_signin/mseip_passgen.py, xml.sax
+excluded module named _frozen_importlib - imported by importlib, importlib.abc, /home/tonydero/repos/mseip_signin/mseip_passgen.py
+missing module named _frozen_importlib_external - imported by importlib._bootstrap, importlib, importlib.abc, /home/tonydero/repos/mseip_signin/mseip_passgen.py
+missing module named _winreg - imported by platform, /home/tonydero/repos/mseip_signin/mseip_passgen.py
+missing module named _scproxy - imported by urllib.request
+missing module named java - imported by platform, /home/tonydero/repos/mseip_signin/mseip_passgen.py
+missing module named 'java.lang' - imported by platform, /home/tonydero/repos/mseip_signin/mseip_passgen.py, xml.sax._exceptions
+missing module named vms_lib - imported by platform, /home/tonydero/repos/mseip_signin/mseip_passgen.py
+missing module named winreg - imported by platform, mimetypes, /home/tonydero/repos/mseip_signin/mseip_passgen.py, urllib.request
+missing module named urllib.unquote - imported by urllib, asn1crypto._iri
+missing module named urllib.quote - imported by urllib, asn1crypto._iri
+missing module named nt - imported by os, ntpath, shutil, /home/tonydero/repos/mseip_signin/mseip_passgen.py
+missing module named ce - imported by os, /home/tonydero/repos/mseip_signin/mseip_passgen.py
+missing module named msvcrt - imported by subprocess, getpass, multiprocessing.spawn, multiprocessing.popen_spawn_win32, /home/tonydero/repos/mseip_signin/mseip_passgen.py
+missing module named _winapi - imported by subprocess, multiprocessing.reduction, multiprocessing.connection, multiprocessing.heap, multiprocessing.popen_spawn_win32, /home/tonydero/repos/mseip_signin/mseip_passgen.py
+missing module named org - imported by copy, /home/tonydero/repos/mseip_signin/mseip_passgen.py
+missing module named _dummy_threading - imported by dummy_threading, /home/tonydero/repos/mseip_signin/mseip_passgen.py
+missing module named _sysconfigdata_dm - imported by _sysconfigdata
+missing module named cStringIO - imported by asn1crypto.core
+missing module named copy_reg - imported by cStringIO
+missing module named UserDict - imported by asn1crypto._ordereddict
+missing module named urlparse - imported by asn1crypto._iri
+missing module named 'ctypes.macholib' - imported by ctypes.util
+runtime module named six.moves - imported by cryptography.x509.general_name
+missing module named StringIO - imported by six

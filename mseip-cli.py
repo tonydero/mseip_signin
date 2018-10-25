@@ -27,13 +27,16 @@ while pass_wrong:
 # once password is correctly enter, import and define everything else
 import datetime as d
 import pandas as pd
+import numpy as np
 import os
 from distutils.util import strtobool
 from time import sleep, time
 import sys
 import smtplib
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import re
+from cryptography.fernet import Fernet
 
 
 cours_ref = []
@@ -47,45 +50,18 @@ cours_ref.append('EE317 Semiconductors & Electronics')
 cours_ref.append('EE320 Signals & Systems I')
 cours_ref.append('EE325 Signals & Systems II')
 cours_ref.append('EE340 Fields & Waves')
-cours_ref.append('another course')  # keep last
+cours_ref.append('Other Course')  # keep last
 dua_file = './dua_file'  # using v4
 key_file = './key_file'
+smtp_file = './smtp_file'
+fernet_key = './fernet_key'
 student_info_file = db_dir / 'student_info.csv'
 time_log_file = db_dir / 'time_log.csv'
 
 def cls():
     os.system('cls' if os.name=='nt' else 'clear')
 
-def signIn(key_val):
-    bann_id = input('Welcome to ECE Peer Mentoring!\n\n'
-                    'Please swipe your Aggie ID or enter your ID#: ')
-    len_id = len(bann_id)
-    # check to see if card was swiped
-    if len_id == 98:
-        bann_id = bann_id[52:61]
-    # check to make sure ID is correct (as much as possible)
-    unchkd_id = True
-    while unchkd_id:
-        len_id = len(bann_id)
-        if len_id == 6:
-            bann_id = '800' + bann_id
-            unchkd_id = False
-        elif len_id < 9 or len_id > 9:
-            bann_id = input('Invalid ID#\n'
-                            'Please swipe your Aggie ID or enter your ID#: ')
-        elif len_id == 9:
-            if bann_id.startswith('800'):
-                unchkd_id = False
-            else:
-                bann_id = input('Invalid ID#\n'
-                                'Please swipe your Aggie ID or enter your'
-                                ' ID#: ')
-        else:
-            bann_id = input('Invalid ID#\n'
-                            'Please swipe your Aggie ID or enter your'
-                            ' ID#: ')
-    #print(bann_id); sleep(3)  # FOR DEBUGGING
-
+def signIn(key_val, bann_id, logd_in_ids):
     # hash ID
     h = sha512()
     h.update(bytes(key_val+bann_id, encoding='ascii'))
@@ -115,18 +91,21 @@ def signIn(key_val):
         dua_all = student_info.loc[bann_id_hash, 'DUA']
         dua_prof = student_info.loc[bann_id_hash, 'ProfUse']
         # check for ID in last 100 time log entries, because under 18s
-        if bann_id_hash in set(time_log['hashedID'][-100:]):
+        #if bann_id_hash in set(time_log['hashedID'][-100:]):
+        if bann_id_hash not in logd_in_ids:
             logd_in_index = time_log.loc[time_log['hashedID'] ==  \
                                          bann_id_hash].index.max()
             logd_in = time_log.iloc[logd_in_index, 1]
             logd_in_time = time_log.iloc[logd_in_index, 2]
             logd_in_dur = curr_time - logd_in_time
+            logd_in_ids.append(bann_id_hash)
         else:
             logd_in = False
+            logd_in_ids.remove(bann_id_hash)
 
         if logd_in:
             # update id in previous entry to no_id_hash
-            if not ovr_18 or not dua_prof:
+            if not ovr_18 and not dua_prof:
                 time_log.iloc[logd_in_index, 0] = no_id_hash
                 time_log = time_log.append({'hashedID': no_id_hash,
                                             'loggedIn': False,
@@ -141,7 +120,7 @@ def signIn(key_val):
                                             'logDuration': logd_in_dur,
                                             'reason': 'log out'},
                                            ignore_index=True)
-                
+
             time_log.to_csv(time_log_file)
             if (not ovr_18 or not dua_all) and dua_prof:
                 print('Your personal data have been discarded.')
@@ -162,8 +141,9 @@ def signIn(key_val):
         returning = False
         cls()
         # present data use agreement
-        with open(dua_file, 'r',encoding="utf8") as fin:
-            print(fin.read())
+        with open(dua_file, 'r',encoding='utf-8') as fin:
+            dua = fin.read()
+            print(dua)
         while True:
             try:
                 ovr_18 = strtobool(input('Are you 18 years of age or older? '))
@@ -175,7 +155,18 @@ def signIn(key_val):
         while not re.match(r"[^@]+@[^@]+\.[^@]+", email):
             print('Invalid email.')
             email = input('Email: ')
-        # need something to trigger sending the email *************************
+        # send email copy of DUA
+        fromaddr = 'NMSU_MSEIP@nmsu.edu'
+        dua_email = MIMEMultipart()
+        dua_email['From'] = fromaddr
+        dua_email['To'] = email
+        dua_email['Subject'] = "NMSU Peer Mentoring Data Use Agreement"
+        dua_email.preamble = ('Hello,\n\nBelow you will find the Data Use '
+                              'Agreement for the NMSU ECE Peer Mentoring '
+                              'sign-in application.')
+        dua_email.attach(MIMEText(dua, 'plain'))
+        dua_email = dua_email.as_string()
+        #server.sendmail(fromaddr,email,dua_email)
         if ovr_18:
             while True:
                 try:
@@ -224,15 +215,38 @@ def signIn(key_val):
         student_info = student_info.append(new_student_info)
         student_info.head()
 
-    cours_resp = []
+    cours_resp = np.zeros(len(cours_ref)).tolist()
     for i, course_name in enumerate(cours_ref):
-        while True:
-            try:
-                cours_resp.append(strtobool(input('Are you here for ' +
-                                 course_name + ' (y/n)? ')))
-                break
-            except ValueError:
-                print('Invalid response. Please answer yes or no.')
+        print(str(i+1) + ') ' + course_name)
+        #while True:
+        #    try:
+        #        cours_resp.append(strtobool(input('Are you here for ' +
+        #                         course_name + ' (y/n)? ')))
+        #        break
+        #    except ValueError:
+        #        print('Invalid response. Please answer yes or no.')
+    cours_resp_str = input('Please enter a comma-seperated list of the'
+                            ' numbers next to the courses you are here to get'
+                            ' help with: ')
+
+    # convert cours_resp_str to indices
+    crs = cours_resp_str.split()
+    crs = [crs[x].split(',') for x,val in enumerate(crs)]
+    if len(crs) > 1:
+        if type(crs[0]) == list:
+            crs = [int(x) for x in np.array([y[0] for y in crs])]
+        else:
+            crs = [int(x) for x in np.array(crs)]
+    else:
+        crs = [int(x) for x in np.array(crs[0])]
+
+    print(crs)
+
+    #use converted indices to indicate course responses
+    for z in crs:
+        cours_resp[z-1] = 1
+    cours_resp = [int(x) for x in cours_resp]
+    print(cours_resp)
 
     # if last course (other) is true, set it to their response
     if cours_resp[-1]:
@@ -280,11 +294,98 @@ def signIn(key_val):
 
     return
 
+# read in password from file for the smtp server
+with open(fernet_key, 'r') as f:
+    key_str = f.read()
+with open(smtp_file, 'r') as f:
+    smtp_str = f.read()
+c = Fernet(bytes(key_str,encoding='utf-8'))
+smtp_pass = c.decrypt(bytes(smtp_str,encoding='utf-8')).decode('utf-8')
+server = smtplib.SMTP('smtp.nmsu.edu',587)
+server.starttls()
+server.login('NMSU_MSEIP@nmsu.com', smtp_pass)
+
 # read key file for seeding sha hash
 with open(key_file, 'r') as keyf:
     key_val = keyf.read()
 
+logd_in_ids = []
+
 while True:
     cls()
-    signIn(key_val)
+    print('                  Welcome to')
+    print('          _   _ __  __  _____ _    _ ')
+    print('         | \ | |  \/  |/ ____| |  | |')
+    print('         |  \| | \  / | (___ | |  | |')
+    print('         | . ` | |\/| |\___ \| |  | |')
+    print('         | |\  | |  | |____) | |__| |')
+    print('         |_| \_|_|  |_|_____/ \____/ ')
+    print('\n             ECE Peer Mentoring!\n')
+    bann_id = input('Please swipe your Aggie ID or enter your ID#:\n')
+    # check to make sure ID is correct (as much as possible)
+    unchkd_id = True
+    while unchkd_id:
+        # for logging everyone out and shutting down the application
+        if bann_id.lower() in ['0','q','quit','e','exit']:
+            quit_sure = strtobool(input('Are you sure you want to shut down '
+                                        'the app and log everyone out? '))
+            if quit_sure:
+                curr_time = time()
+                for bann_id_hash in logd_in_ids:
+                    # load values from database
+                    student_info = pd.read_csv(student_info_file, index_col=0)
+                    time_log = pd.read_csv(time_log_file, index_col=0)
+                    ovr_18 = student_info.loc[bann_id_hash, 'over18']
+                    dua_all = student_info.loc[bann_id_hash, 'DUA']
+                    dua_prof = student_info.loc[bann_id_hash, 'ProfUse']
+                    logd_in_index = time_log.loc[time_log['hashedID'] ==  \
+                                                 bann_id_hash].index.max()
+                    logd_in_time = time_log.iloc[logd_in_index, 2]
+                    logd_in_dur = curr_time - logd_in_time
+
+                    # update id in previous entry to no_id_hash
+                    if not ovr_18 and not dua_prof:
+                        time_log.iloc[logd_in_index, 0] = no_id_hash
+                        time_log = time_log.append({'hashedID': no_id_hash,
+                                                    'loggedIn': False,
+                                                    'logTime': curr_time,
+                                                    'logDuration': logd_in_dur,
+                                                    'reason': 'log out'},
+                                                   ignore_index=True)
+                    else:
+                        time_log = time_log.append({'hashedID': bann_id_hash,
+                                                    'loggedIn': False,
+                                                    'logTime': curr_time,
+                                                    'logDuration': logd_in_dur,
+                                                    'reason': 'log out'},
+                                                   ignore_index=True)
+
+                    time_log.to_csv(time_log_file)
+                server.quit()
+                raise SystemExit('All students are now logged out.\nThanks for'
+                                 ' using the NMSU ECE Peer Mentoring sign-in'
+                                 ' application!')
+        len_id = len(bann_id)
+        # check to see if card was swiped
+        if len_id == 98:
+            bann_id = bann_id[52:61]
+        # checks to make sure care read correctly or manual input correct
+        if len_id == 6:
+            bann_id = '800' + bann_id
+            unchkd_id = False
+        elif len_id < 9 or len_id > 9:
+            bann_id = input('Invalid ID#\n'
+                            'Please swipe your Aggie ID or enter your ID#:\n')
+        elif len_id == 9:
+            if bann_id.startswith('800'):
+                unchkd_id = False
+            else:
+                bann_id = input('Invalid ID#\n'
+                                'Please swipe your Aggie ID or enter your'
+                                ' ID#:\n')
+        else:
+            bann_id = input('Invalid ID#\n'
+                            'Please swipe your Aggie ID or enter your ID#:\n')
+    #print(bann_id); sleep(3)  # FOR DEBUGGING
+    signIn(key_val, bann_id, logd_in_ids)
 
