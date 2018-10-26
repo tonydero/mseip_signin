@@ -61,7 +61,7 @@ time_log_file = db_dir / 'time_log.csv'
 def cls():
     os.system('cls' if os.name=='nt' else 'clear')
 
-def signIn(key_val, bann_id, logd_in_ids):
+def signIn(key_val, bann_id, logd_in_ids, server):
     # hash ID
     h = sha512()
     h.update(bytes(key_val+bann_id, encoding='ascii'))
@@ -128,7 +128,7 @@ def signIn(key_val, bann_id, logd_in_ids):
                 print('All of your data have been discarded.')
             print('Thank you for using ECE Peer Mentoring! Have a great day!')
             sleep(4)
-            return
+            return logd_in_ids
 
         #if (not ovr_18 or not dua_all) and dua_prof:
         #    print('Your personal data will be discarded after this session.')
@@ -161,12 +161,13 @@ def signIn(key_val, bann_id, logd_in_ids):
         dua_email['From'] = fromaddr
         dua_email['To'] = email
         dua_email['Subject'] = "NMSU Peer Mentoring Data Use Agreement"
-        dua_email.preamble = ('Hello,\n\nBelow you will find the Data Use '
-                              'Agreement for the NMSU ECE Peer Mentoring '
-                              'sign-in application.')
-        dua_email.attach(MIMEText(dua, 'plain'))
-        dua_email = dua_email.as_string()
-        #server.sendmail(fromaddr,email,dua_email)
+        preamble = ('Hello,\n\nBelow you will find the Data Use '
+                    'Agreement for the NMSU ECE Peer Mentoring '
+                    'sign-in application.\n\n')
+        dua_msg = MIMEText(preamble+dua, 'plain')
+        dua_email.attach(dua_msg)
+        server.sendmail(fromaddr,email,dua_email.as_string())
+
         if ovr_18:
             while True:
                 try:
@@ -292,7 +293,7 @@ def signIn(key_val, bann_id, logd_in_ids):
         print('All of your data will be discarded after this session.')
         sleep(3)
 
-    return
+    return logd_in_ids
 
 # read in password from file for the smtp server
 with open(fernet_key, 'r') as f:
@@ -302,8 +303,8 @@ with open(smtp_file, 'r') as f:
 c = Fernet(bytes(key_str,encoding='utf-8'))
 smtp_pass = c.decrypt(bytes(smtp_str,encoding='utf-8')).decode('utf-8')
 server = smtplib.SMTP('smtp.nmsu.edu',587)
-server.starttls()
 server.login('NMSU_MSEIP@nmsu.com', smtp_pass)
+#server = smtplib.SMTP('localhost',1025)
 
 # read key file for seeding sha hash
 with open(key_file, 'r') as keyf:
@@ -387,5 +388,5 @@ while True:
             bann_id = input('Invalid ID#\n'
                             'Please swipe your Aggie ID or enter your ID#:\n')
     #print(bann_id); sleep(3)  # FOR DEBUGGING
-    signIn(key_val, bann_id, logd_in_ids)
+    logd_in_ids = signIn(key_val, bann_id, logd_in_ids, server)
 
