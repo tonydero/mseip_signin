@@ -17,7 +17,12 @@ while val_incorrect:
         c = Fernet(bytes(key_str,encoding='utf-8'))
         output_val = c.encrypt(bytes(input_val,encoding='utf-8'))
         output_val = output_val.decode('utf-8')
+        decode_val = c.decrypt(bytes(output_val,encoding='utf-8')).decode(
+                     'utf-8')
     print(output_val, 'is the output result')
+    show_decoded = strtobool(input('Show the decrypted value? '))
+    if show_decoded:
+        print(decode_val, 'is what will be decrypted')
     val_incorrect = not strtobool(input('Is this okay? '))
 file_out = strtobool(input('Do you want to output this to a file? '))
 if file_out:

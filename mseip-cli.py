@@ -302,16 +302,17 @@ with open(smtp_file, 'r') as f:
     smtp_str = f.read()
 c = Fernet(bytes(key_str,encoding='utf-8'))
 smtp_addr = 'NMSU_MSEIP@nmsu.edu'
-#smtp_pass = c.decrypt(bytes(smtp_str,encoding='utf-8')).decode('utf-8')
-smtp_pass = getpass.getpass(smtp_addr + ' password:')  # for debug
+smtp_pass = c.decrypt(bytes(smtp_str,encoding='utf-8')).decode('utf-8')
+#smtp_pass = getpass.getpass(smtp_addr + ' password:')  # for debug
+print(smtp_pass)
 server = smtplib.SMTP('smtp.nmsu.edu',587)
 server.connect("smtp.nmsu.edu",587)
+#server = smtplib.SMTP('smtp.gmail.com',587)  # for debug
+#server.login('elzzid.prime@gmail.com', smtp_pass)  # for debug
 server.ehlo()
 server.starttls()
 server.ehlo()
 server.login(smtp_addr, smtp_pass)
-#server = smtplib.SMTP('smtp.gmail.com',587)  # for debug
-#server.login('elzzid.prime@gmail.com', smtp_pass)  # for debug
 #server = smtplib.SMTP('localhost',1025)  # for debug
 
 # read key file for seeding sha hash
@@ -329,7 +330,7 @@ while True:
     print('         | . ` | |\/| |\___ \| |  | |')
     print('         | |\  | |  | |____) | |__| |')
     print('         |_| \_|_|  |_|_____/ \____/ ')
-    print('\n             ECE Peer Mentoring!\n')
+    print('\n              ECE Peer Mentoring!\n')
     bann_id = input('Please swipe your Aggie ID or enter your ID#:\n')
     # check to make sure ID is correct (as much as possible)
     unchkd_id = True
