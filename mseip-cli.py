@@ -301,10 +301,15 @@ with open(fernet_key, 'r') as f:
 with open(smtp_file, 'r') as f:
     smtp_str = f.read()
 c = Fernet(bytes(key_str,encoding='utf-8'))
-smtp_pass = c.decrypt(bytes(smtp_str,encoding='utf-8')).decode('utf-8')
-#smtp_pass = getpass.getpass('smtp server password:')  # for debug
+smtp_addr = 'NMSU_MSEIP@nmsu.edu'
+#smtp_pass = c.decrypt(bytes(smtp_str,encoding='utf-8')).decode('utf-8')
+smtp_pass = getpass.getpass(smtp_addr + ' password:')  # for debug
 server = smtplib.SMTP('smtp.nmsu.edu',587)
-server.login('NMSU_MSEIP@nmsu.edu', smtp_pass)
+server.connect("smtp.nmsu.edu",587)
+server.ehlo()
+server.starttls()
+server.ehlo()
+server.login(smtp_addr, smtp_pass)
 #server = smtplib.SMTP('smtp.gmail.com',587)  # for debug
 #server.login('elzzid.prime@gmail.com', smtp_pass)  # for debug
 #server = smtplib.SMTP('localhost',1025)  # for debug

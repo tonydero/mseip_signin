@@ -10,3 +10,4 @@
 *.exe
 build/mseip-cli/xref-mseip-cli.html
 build/mseip-cli/warn-mseip-cli.txt
+mseip-cli

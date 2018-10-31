@@ -17,6 +17,7 @@ missing module named multiprocessing.set_start_method - imported by multiprocess
 missing module named multiprocessing.get_start_method - imported by multiprocessing, multiprocessing.spawn
 missing module named multiprocessing.SimpleQueue - imported by multiprocessing, concurrent.futures.process
 missing module named 'org.python' - imported by pickle, setuptools.sandbox, xml.sax, /home/tonydero/repos/mseip_signin/mseip-cli.py
+missing module named ce - imported by os, /home/tonydero/repos/mseip_signin/mseip-cli.py
 excluded module named _frozen_importlib - imported by importlib, importlib.abc, /home/tonydero/repos/mseip_signin/mseip-cli.py
 missing module named _frozen_importlib_external - imported by importlib._bootstrap, importlib, importlib.abc, /home/tonydero/repos/mseip_signin/mseip-cli.py
 missing module named _winreg - imported by platform, numpy.distutils.cpuinfo, IPython.utils.path, /home/tonydero/repos/mseip_signin/mseip-cli.py, pygments.formatters.img
@@ -24,32 +25,31 @@ missing module named _scproxy - imported by urllib.request
 missing module named java - imported by platform, unittest.mock, /home/tonydero/repos/mseip_signin/mseip-cli.py
 missing module named 'java.lang' - imported by platform, xml.sax._exceptions, /home/tonydero/repos/mseip_signin/mseip-cli.py
 missing module named vms_lib - imported by platform, /home/tonydero/repos/mseip_signin/mseip-cli.py
+missing module named msvcrt - imported by subprocess, getpass, multiprocessing.spawn, multiprocessing.popen_spawn_win32, numpy.distutils.mingw32ccompiler, asyncio.windows_utils, prompt_toolkit.terminal.win32_input, prompt_toolkit.eventloop.win32, IPython.core.page, /home/tonydero/repos/mseip_signin/mseip-cli.py
+missing module named _winapi - imported by subprocess, multiprocessing.reduction, multiprocessing.connection, multiprocessing.heap, multiprocessing.popen_spawn_win32, asyncio.windows_events, asyncio.windows_utils, /home/tonydero/repos/mseip_signin/mseip-cli.py
 missing module named winreg - imported by platform, mimetypes, distutils.msvc9compiler, distutils._msvccompiler, distutils.msvccompiler, numpy.distutils.cpuinfo, urllib.request, IPython.utils.path, /home/tonydero/repos/mseip_signin/mseip-cli.py, pygments.formatters.img
+missing module named urllib.urlopen - imported by urllib, pygments.lexers._postgres_builtins, pygments.lexers._lua_builtins
 missing module named urllib.urlretrieve - imported by urllib, pygments.lexers._php_builtins
 missing module named urllib.FancyURLopener - imported by urllib, pygments.lexers._sourcemod_builtins
-missing module named urllib.urlopen - imported by urllib, pygments.lexers._lua_builtins, pygments.lexers._postgres_builtins
 missing module named urllib.unquote - imported by urllib, asn1crypto._iri
 missing module named urllib.quote - imported by urllib, asn1crypto._iri
 missing module named urllib.pathname2url - imported by urllib, pandas.io.common
 missing module named urllib.urlencode - imported by urllib, IPython.lib.display, pandas.io.common
 missing module named urllib.splittag - imported by urllib, setuptools.py26compat
-missing module named org - imported by copy, /home/tonydero/repos/mseip_signin/mseip-cli.py
-missing module named nt - imported by os, ntpath, shutil, pathlib, /home/tonydero/repos/mseip_signin/mseip-cli.py
-missing module named ce - imported by os, /home/tonydero/repos/mseip_signin/mseip-cli.py
-missing module named msvcrt - imported by subprocess, getpass, multiprocessing.spawn, multiprocessing.popen_spawn_win32, numpy.distutils.mingw32ccompiler, asyncio.windows_utils, prompt_toolkit.terminal.win32_input, prompt_toolkit.eventloop.win32, IPython.core.page, /home/tonydero/repos/mseip_signin/mseip-cli.py
-missing module named _winapi - imported by subprocess, multiprocessing.reduction, multiprocessing.connection, multiprocessing.heap, multiprocessing.popen_spawn_win32, asyncio.windows_events, asyncio.windows_utils, /home/tonydero/repos/mseip_signin/mseip-cli.py
 missing module named _dummy_threading - imported by dummy_threading, /home/tonydero/repos/mseip_signin/mseip-cli.py
+missing module named nt - imported by os, ntpath, shutil, pathlib, /home/tonydero/repos/mseip_signin/mseip-cli.py
+missing module named org - imported by copy, /home/tonydero/repos/mseip_signin/mseip-cli.py
+missing module named cStringIO - imported by pandas.compat, cPickle, cffi.ffiplatform, pygments.util, xlrd.timemachine, asn1crypto.core
+missing module named copy_reg - imported by cStringIO, cPickle, numpy.core
+missing module named UserDict - imported by pytz.lazy, asn1crypto._ordereddict, PIL.PdfParser
+missing module named urlparse - imported by numpy.lib._datasource, pandas.io.common, pandas.io.s3, asn1crypto._iri
+missing module named 'ctypes.macholib' - imported by ctypes.util
 runtime module named six.moves - imported by dateutil.tz.win, dateutil.rrule, prompt_toolkit.utils, prompt_toolkit.document, prompt_toolkit.buffer, prompt_toolkit.layout.containers, prompt_toolkit.layout.controls, prompt_toolkit.layout.lexers, prompt_toolkit.layout.processors, prompt_toolkit.layout.margins, prompt_toolkit.styles.from_dict, prompt_toolkit.renderer, prompt_toolkit.key_binding.bindings.named_commands, prompt_toolkit.key_binding.bindings.scroll, prompt_toolkit.key_binding.bindings.vi, prompt_toolkit.layout.menus, prompt_toolkit.terminal.vt100_output, prompt_toolkit.terminal.win32_input, prompt_toolkit.key_binding.input_processor, prompt_toolkit.terminal.vt100_input, matplotlib.cbook, matplotlib.backend_bases, matplotlib.colors, matplotlib.textpath, matplotlib.hatch, matplotlib.afm, matplotlib.font_manager, matplotlib.patches, matplotlib.markers, matplotlib.text, matplotlib.axes._subplots, cycler, matplotlib.colorbar, matplotlib.collections, matplotlib.contour, matplotlib.dviread, matplotlib.offsetbox, 'six.moves.urllib', matplotlib.dates, matplotlib.backends.backend_svg, matplotlib.legend_handler, matplotlib.mlab, matplotlib.tri.triinterpolate, matplotlib.widgets, matplotlib.axes._axes, matplotlib.stackplot, matplotlib.streamplot, matplotlib.table, matplotlib.axes._base, matplotlib, cryptography.x509.general_name, matplotlib.backends.tkagg, matplotlib.backends._backend_tk, matplotlib.backends.backend_ps
 missing module named six.moves.zip - imported by six.moves, matplotlib.cbook, matplotlib.colors, matplotlib.textpath, matplotlib.patches, matplotlib.text, cycler, matplotlib.colorbar, matplotlib.collections, matplotlib.offsetbox, matplotlib.dates, matplotlib.legend_handler, matplotlib.mlab, matplotlib.widgets, matplotlib.axes._axes
 missing module named six.moves.xrange - imported by six.moves, matplotlib.cbook, matplotlib.backend_bases, matplotlib.hatch, matplotlib.markers, matplotlib.colorbar, matplotlib.contour, matplotlib.dviread, matplotlib.offsetbox, matplotlib.backends.backend_svg, matplotlib.mlab, matplotlib.tri.triinterpolate, matplotlib.axes._axes, matplotlib.stackplot, matplotlib.streamplot, matplotlib.table, matplotlib.axes._base
 missing module named six.moves.map - imported by six.moves, prompt_toolkit.document, matplotlib.afm, matplotlib.patches, matplotlib.axes._subplots, matplotlib.mlab
 missing module named six.moves.range - imported by six.moves, dateutil.rrule, prompt_toolkit.utils, prompt_toolkit.document, prompt_toolkit.buffer, prompt_toolkit.layout.containers, prompt_toolkit.layout.controls, prompt_toolkit.layout.lexers, prompt_toolkit.layout.processors, prompt_toolkit.layout.margins, prompt_toolkit.styles.from_dict, prompt_toolkit.renderer, prompt_toolkit.key_binding.bindings.named_commands, prompt_toolkit.key_binding.bindings.scroll, prompt_toolkit.key_binding.bindings.vi, prompt_toolkit.layout.menus, prompt_toolkit.terminal.vt100_output, prompt_toolkit.terminal.win32_input, prompt_toolkit.key_binding.input_processor, prompt_toolkit.terminal.vt100_input
 missing module named six.moves.winreg - imported by six.moves, dateutil.tz.win, matplotlib.font_manager
-missing module named UserDict - imported by pytz.lazy, asn1crypto._ordereddict, PIL.PdfParser
-missing module named urlparse - imported by numpy.lib._datasource, pandas.io.common, pandas.io.s3, asn1crypto._iri
-missing module named 'ctypes.macholib' - imported by ctypes.util
-missing module named cStringIO - imported by pandas.compat, cPickle, cffi.ffiplatform, pygments.util, xlrd.timemachine, asn1crypto.core
-missing module named copy_reg - imported by cStringIO, cPickle, numpy.core
 missing module named numpy.arccosh - imported by numpy, scipy.signal.filter_design
 missing module named numpy.arcsinh - imported by numpy, scipy.signal.filter_design
 missing module named numpy.arctan - imported by numpy, scipy.signal.filter_design
@@ -142,8 +142,8 @@ missing module named 'mpl_toolkits.natgrid' - imported by matplotlib.mlab
 missing module named matplotlib.axes.Subplot - imported by matplotlib.axes, matplotlib.pyplot, pandas.plotting._core
 missing module named "'six.moves.urllib'.request" - imported by matplotlib.image, matplotlib
 missing module named "'six.moves.urllib'.parse" - imported by matplotlib.image, matplotlib.textpath
+missing module named olefile - imported by PIL.MicImagePlugin, PIL.FpxImagePlugin
 missing module named Tkinter - imported by PIL.ImageTk
-missing module named olefile - imported by PIL.FpxImagePlugin, PIL.MicImagePlugin
 missing module named 'PySide.QtCore' - imported by PIL.ImageQt
 missing module named 'PyQt4.QtCore' - imported by PIL.ImageQt
 missing module named 'PyQt5.QtCore' - imported by PIL.ImageQt
@@ -177,8 +177,8 @@ missing module named 'nose.tools' - imported by IPython.testing.tools, IPython.t
 missing module named win_unicode_console - imported by IPython.terminal.interactiveshell
 missing module named pygments.lexers.PythonLexer - imported by pygments.lexers, IPython.core.oinspect
 missing module named chardet - imported by pygments.lexer
-missing module named ctags - imported by pygments.formatters.html
 missing module named pygments.formatters.HtmlFormatter - imported by pygments.formatters, IPython.core.oinspect
+missing module named ctags - imported by pygments.formatters.html
 missing module named pysqlite2 - imported by IPython.core.history
 missing module named repr - imported by IPython.core.debugger
 missing module named IPython.utils.warn - imported by IPython.utils, IPython.testing.tools
