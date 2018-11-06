@@ -61,7 +61,7 @@ time_log_file = db_dir / 'time_log.csv'
 def cls():
     os.system('cls' if os.name=='nt' else 'clear')
 
-def signIn(key_val, bann_id, logd_in_ids, smtp_pass):
+def signIn(key_val, bann_id, logd_in_ids, smtp_pass, c):
     # hash ID
     h = sha512()
     h.update(bytes(key_val+bann_id, encoding='ascii'))
@@ -183,7 +183,7 @@ def signIn(key_val, bann_id, logd_in_ids, smtp_pass):
         dua_email = MIMEMultipart()
         dua_email['From'] = smtp_addr
         dua_email['To'] = email
-        dua_email['Subject'] = "NMSU Peer Mentoring Data Use Agreement"
+        dua_email['Subject'] = "NMSU ECE Peer Mentoring Sign-in Data Use Agreement"
         preamble = ('Hello,\n\nBelow you will find the Data Use '
                     'Agreement for the NMSU ECE Peer Mentoring '
                     'sign-in application.\n\n')
@@ -220,20 +220,20 @@ def signIn(key_val, bann_id, logd_in_ids, smtp_pass):
                     except ValueError:
                         print('Incorrect response. Please answer yes or no.')
         else:
-            dua_all = False
+            dua_all = 1
             while True:
                 try:
                     prof_ques = ('Is(Are) your course instructor(s) providing '
                                  'credit for your attendance? (Data will be '
                                  'collected only for the purpose of providing '
                                  'attendance information to your course '
-                                 'instructor(s) ')
+                                 'instructor(s)) ')
                     dua_prof = strtobool(input(prof_ques))
                     break
                 except ValueError:
                     print('Incorrect response. Please answer yes or no.')
         if dua_all:
-            dua_prof = True
+            dua_prof = 1
 
         cls()
 
@@ -362,7 +362,7 @@ while True:
     unchkd_id = True
     while unchkd_id:
         # for logging everyone out and shutting down the application
-        if bann_id.lower() in ['0','q','quit','e','exit']:
+        if bann_id.lower() in ['0','q','quit','e','x','exit']:
             quit_sure = strtobool(input('Are you sure you want to shut down '
                                         'the app and log everyone out (y/n)? '))
             if quit_sure:
