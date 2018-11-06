@@ -236,6 +236,9 @@ def signIn(key_val, bann_id, logd_in_ids, smtp_pass):
             dua_prof = True
 
         cls()
+
+        # encrypt email
+        email = c.encrypt(bytes(email, encoding='ascii')).decode('ascii')
         # create new row to be appended to student_info database
         new_student_info = pd.DataFrame({'over18': ovr_18,
                                          'DUA': dua_all,
@@ -257,14 +260,14 @@ def signIn(key_val, bann_id, logd_in_ids, smtp_pass):
         #        print('Invalid response. Please answer yes or no.')
     cours_resp_str = input('Please enter a comma-seperated list of the'
                             ' numbers next to the courses you are here to get'
-                            ' help with (or leave blank if you are not here for'
-                            ' any specific course: ')
+                            ' help with (leave blank if you are not here for'
+                            ' any specific course): ')
 
-    if len(cours_resp_str) > 0:
+    if len(cours_resp_str) > 0:  # check if left blank
         crs_check = cours_resp_str.split(',')
         crs_check = ''.join(crs_check)
         crs_check = crs_check.replace(' ', '')
-        if crs_check.isdigit():
+        if crs_check.isdigit():  # check to make sure it's numbers
             # convert cours_resp_str to indices
             crs = cours_resp_str.split()
             crs = [crs[x].split(',') for x,val in enumerate(crs)]
@@ -363,7 +366,7 @@ while True:
             quit_sure = strtobool(input('Are you sure you want to shut down '
                                         'the app and log everyone out (y/n)? '))
             if quit_sure:
-                print(logd_in_ids)
+                #print(logd_in_ids)
                 curr_time = time()
                 for bann_id_hash in logd_in_ids:
                     # load values from database
@@ -374,7 +377,7 @@ while True:
                     dua_prof = student_info.loc[bann_id_hash, 'ProfUse']
                     logd_in_index = time_log.loc[time_log['hashedID'] ==  \
                                                  bann_id_hash].index.max()
-                    logd_in_time = time_log.iloc[logd_in_index, 2]
+                    logd_in_time = time_log.iloc[logd_in_index, 1]
                     logd_in_dur = curr_time - logd_in_time
 
                     # update id in previous entry to no_id_hash
@@ -429,5 +432,5 @@ while True:
     #print(bann_id); sleep(3)  # FOR DEBUGGING
 
     # run the primary login function
-    logd_in_ids = signIn(key_val, bann_id, logd_in_ids, smtp_pass)
+    logd_in_ids = signIn(key_val, bann_id, logd_in_ids, smtp_pass, c)
 
