@@ -5,11 +5,11 @@
 import getpass
 from hashlib import sha512
 from pathlib import Path
-db_dir = Path.home() / 'MSEIP_DB'
+local_db_dir = Path.home().parents[0] / 'Public' / 'MSEIP_DB'
 pass_file = './pass_file'
 
 
-print('DB storage location: ', str(db_dir))
+print('DB storage location: ', str(local_db_dir))
 with open(pass_file, 'r') as passf:
     pass_chk = passf.read()
 pass_wrong = True
@@ -37,6 +37,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import re
 from cryptography.fernet import Fernet
+import paramiko
 
 
 cours_ref = []
@@ -51,12 +52,15 @@ cours_ref.append('EE320 Signals & Systems I')
 cours_ref.append('EE325 Signals & Systems II')
 cours_ref.append('EE340 Fields & Waves')
 cours_ref.append('Other Course')  # keep last
+ssh_file = './ssh_file'  # gryffindor
 dua_file = './dua_file'  # using v4
 key_file = './key_file'
 smtp_file = './smtp_file'
 fernet_key = './fernet_key'
-student_info_file = db_dir / 'student_info.csv'
-time_log_file = db_dir / 'time_log.csv'
+student_info_file = local_db_dir / 'student_info.csv'
+time_log_file = local_db_dir / 'time_log.csv'
+remote_student_info_file = '/home/tonydero/MSEIP_DB/student_info.csv'
+remote_time_log_file = '/home/tonydero/MSEIP_DB/time_log.csv'
 
 def cls():
     os.system('cls' if os.name=='nt' else 'clear')
@@ -84,7 +88,7 @@ def signIn(key_val, bann_id, logd_in_ids, smtp_pass, c):
                                          'logDuration',
                                          'reason']
                                          + cours_ref)
-        Path.mkdir(db_dir, exist_ok=True)
+        Path.mkdir(local_db_dir, exist_ok=True)
 
     # check database for ID
     curr_time = time()
@@ -337,8 +341,11 @@ with open(fernet_key, 'r') as f:
     key_str = f.read()
 with open(smtp_file, 'r') as f:
     smtp_str = f.read()
+with open(ssh_file, 'r') as f:
+    ssh_str = f.read()
 c = Fernet(bytes(key_str,encoding='utf-8'))
 smtp_pass = c.decrypt(bytes(smtp_str,encoding='utf-8')).decode('utf-8')
+ssh_pass = c.decrypt(bytes(ssh_str,encoding='utf-8')).decode('utf-8')
 
 # read key file for seeding sha hashes
 with open(key_file, 'r') as keyf:
@@ -346,6 +353,49 @@ with open(key_file, 'r') as keyf:
 
 # make sure logd_in_ids is initialized empty
 logd_in_ids = []
+
+ssh = paramiko.SSHClient()
+#ssh_pass = 'faketesterrorpassword'
+try:
+    ssh_okay = True
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect('gryffindor.nmsu.edu',username='tonydero',password=ssh_pass)
+    sftp = ssh.open_sftp()
+    sftp.get(remote_time_log_file,time_log_file)
+    sftp.get(remote_student_info_file,student_info_file)
+except paramiko.SSHException:
+    ssh_okay = False
+    print('SSH Failure. Using only local fallback and sending error email'
+          ' to Dr. Boucheron and Tony DeRocchis.')
+    smtp_addr = 'NMSU_MSEIP@nmsu.edu'
+    server = smtplib.SMTP('smtp.nmsu.edu',587)
+    server.connect('smtp.nmsu.edu',587)
+    server.ehlo()
+    server.starttls()
+    server.ehlo()
+    server.login(smtp_addr, smtp_pass)
+    ssh_email = MIMEMultipart()
+    ssh_email['From'] = smtp_addr
+    ssh_email['Subject'] = "MSEIP Sign-in SSH error"
+    ssh_error_msg = ('There was an error in the SSH connection on the MSEIP'
+                     ' Sign-in app. The local copy will need to be manually'
+                     ' synced with the server copy.')
+    ssh_msg = MIMEText(ssh_error_msg, 'plain')  # drop the first line
+    ssh_email.attach(ssh_msg)
+    ssh_email_tony = ssh_email
+    ssh_email_drboucheron = ssh_email
+    ssh_email_tony['To'] = 'tonydero@nmsu.edu'
+    ssh_email_drboucheron['To'] = 'lboucher@nmsu.edu'
+    # since we MUST send an email, if it fails, loop back around to login
+    try:
+        server.sendmail(smtp_addr,'tonydero@nmsu.edu',
+                        ssh_email_tony.as_string())
+        server.sendmail(smtp_addr,'lboucher@nmsu.edu',
+                        ssh_email_drboucheron.as_string())
+        server.quit()
+    except:
+        print('Mail Send Error. Please inform Dr. Boucheron and/or '
+              'Tony DeRocchis.')
 
 while True:
     cls()
@@ -398,6 +448,10 @@ while True:
                                                    ignore_index=True)
 
                     time_log.to_csv(time_log_file)
+                if ssh_okay:
+                    sftp.put(time_log_file,remote_time_log_file)
+                    sftp.put(student_info_file,remote_student_info_file)
+
                 raise SystemExit('All students are now logged out.\nThanks for'
                                  ' using the NMSU ECE Peer Mentoring sign-in'
                                  ' application!')
