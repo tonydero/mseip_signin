@@ -3,10 +3,11 @@ Initial command-line app created for MSEIP peer mentors to use to log students i
 
 Goal:
 - Ask for ID
-- log arrival time
 - Search db for ID
-- If the ID is in the db, pull list of core courses the student is taking and display them
-- If not, display data use agreement and ask followup questions
-- Ask for which core courses the student is taking. (would be an array of check boxes eventually)
-- Ask why student is there.
-- Save responses and times
+- If the ID is in the db, retrieve response to the data use agreement (DUA)
+- If not, display DUA and ask followup questions
+- Ask for which courses the student is there to get help
+- Ask for what the student is there for help
+- Save responses (if applicable) and log time
+- Log time of exit on next swipe
+- Log everyone out, if still logged in, when shut down
