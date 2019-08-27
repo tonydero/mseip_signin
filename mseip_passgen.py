@@ -3,8 +3,8 @@ from hashlib import sha512
 from cryptography.fernet import Fernet
 from distutils.util import strtobool
 
-val_incorrect = 1
-while val_incorrect:
+val_correct = 0
+while not val_correct:
     input_val = getpass.getpass('What do you want to hash or encode'
                                '(will not show)? ')
     hash_input = strtobool(input('Do you want to hash the input? (\'n\' will '
@@ -19,11 +19,11 @@ while val_incorrect:
         output_val = output_val.decode('utf-8')
         decode_val = c.decrypt(bytes(output_val,encoding='utf-8')).decode(
                      'utf-8')
+        show_decoded = strtobool(input('Show the decrypted value? '))
+        if show_decoded:
+            print(decode_val, 'is what will be decrypted')
     print(output_val, 'is the output result')
-    show_decoded = strtobool(input('Show the decrypted value? '))
-    if show_decoded:
-        print(decode_val, 'is what will be decrypted')
-    val_incorrect = not strtobool(input('Is this okay? '))
+    val_correct = strtobool(input('Is this okay? '))
 file_out = strtobool(input('Do you want to output this to a file? '))
 if file_out:
     file_name = input('What do you want to name the file? ')
